@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/najibulloShapoatov/http/pkg/banners"
-	"github.com/najibulloShapoatov/http/cmd/app"
+	"net"
 	"net/http"
 	"os"
+
+	"github.com/najibulloShapoatov/http/cmd/app"
+	"github.com/najibulloShapoatov/http/pkg/banners"
 )
 
 func main() {
@@ -17,14 +19,14 @@ func main() {
 }
 
 func execute(h, p string) error {
- mux := http.NewServeMux()
- bnrSvc := banners.NewService() 
+	mux := http.NewServeMux()
+	bnrSvc := banners.NewService()
 
- sr := app.NewServer(mux, bnrSvc)
+	sr := app.NewServer(mux, bnrSvc)
 
- srv := &http.Server{
-	 Addr: net.JoinHostPort(h, p),
-	 Handler: sr,
- }
- return srv.ListenAndServe()
+	srv := &http.Server{
+		Addr:    net.JoinHostPort(h, p),
+		Handler: sr,
+	}
+	return srv.ListenAndServe()
 }
