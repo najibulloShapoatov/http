@@ -54,7 +54,7 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	defer s.mu.RUnlock()
 
 	if item.ID == 0 {
-		sID = sID + 1
+		sID++
 		item.ID = sID
 		s.items = append(s.items, item)
 		return item, nil
@@ -86,3 +86,5 @@ func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 func removeIndex(s []*Banner, index int) []*Banner {
 	return append(s[:index], s[index+1:]...)
 }
+
+
