@@ -35,15 +35,20 @@ func (s *Server) Init() {
 
 func (s *Server) handleGetAllBanners(w http.ResponseWriter, r *http.Request) {
 
+	//берем все баннеры из сервиса
 	banners, err := s.bannerSvc.All(r.Context())
+
+	//если получили какую нибуд ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
 		return
 	}
 
+	//преобразуем данные в JSON
 	data, err := json.Marshal(banners)
 
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
@@ -55,24 +60,31 @@ func (s *Server) handleGetAllBanners(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
+	//получаем ID из параметра запроса
 	idP := r.URL.Query().Get("id")
+
+	// переобразуем его в число
 	id, err := strconv.ParseInt(idP, 10, 64)
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
 		return
 	}
 
+	//получаем баннер из сервиса
 	banner, err := s.bannerSvc.ByID(r.Context(), id)
-
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
 		return
 	}
 
+	//преобразуем данные в JSON
 	data, err := json.Marshal(banner)
 
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
@@ -84,6 +96,7 @@ func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 
+	//получаем данные из параметра запроса
 	idP := r.URL.Query().Get("id")
 	title := r.URL.Query().Get("title")
 	content := r.URL.Query().Get("content")
@@ -91,12 +104,13 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	link := r.URL.Query().Get("link")
 
 	id, err := strconv.ParseInt(idP, 10, 64)
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
 		return
 	}
-	//Здесь опционалная проверка то что если все данные приходит пустыми
+	//Здесь опционалная проверка то что если все данные приходит пустыми то вернем ошибку
 	if title == "" && content == "" && button == "" && link == "" {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
@@ -113,15 +127,17 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	}
 
 	banner, err := s.bannerSvc.Save(r.Context(), item)
-
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
 		return
 	}
 
+	//преобразуем данные в JSON
 	data, err := json.Marshal(banner)
 
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
@@ -133,6 +149,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 	idP := r.URL.Query().Get("id")
 	id, err := strconv.ParseInt(idP, 10, 64)
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
@@ -140,15 +157,17 @@ func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	banner, err := s.bannerSvc.RemoveByID(r.Context(), id)
-
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
 		return
 	}
 
+	//преобразуем данные в JSON
 	data, err := json.Marshal(banner)
 
+	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
