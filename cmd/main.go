@@ -23,6 +23,7 @@ func execute(h, p string) error {
 	bnrSvc := banners.NewService()
 
 	sr := app.NewServer(mux, bnrSvc)
+	sr.Init()
 
 	srv := &http.Server{
 		Addr:    net.JoinHostPort(h, p),
