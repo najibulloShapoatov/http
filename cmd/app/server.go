@@ -39,6 +39,7 @@ func (s *Server) handleGetAllBanners(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	data, err := json.Marshal(banners)
@@ -46,6 +47,7 @@ func (s *Server) handleGetAllBanners(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	respondJSON(w, data)
@@ -58,6 +60,7 @@ func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
+		return
 	}
 
 	banner, err := s.bannerSvc.ByID(r.Context(), id)
@@ -65,6 +68,7 @@ func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	data, err := json.Marshal(banner)
@@ -72,6 +76,7 @@ func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	respondJSON(w, data)
@@ -89,10 +94,12 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
+		return
 	}
 	if title == "" && content == "" && button == "" && link == "" {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
+		return
 	}
 
 	item := &banners.Banner{
@@ -108,6 +115,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	data, err := json.Marshal(banner)
@@ -115,6 +123,7 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 	respondJSON(w, data)
 }
@@ -125,6 +134,7 @@ func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
+		return
 	}
 
 	banner, err := s.bannerSvc.RemoveByID(r.Context(), id)
@@ -132,6 +142,7 @@ func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 
 	data, err := json.Marshal(banner)
@@ -139,6 +150,7 @@ func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err)
 		errorWriter(w, http.StatusInternalServerError)
+		return
 	}
 	respondJSON(w, data)
 }

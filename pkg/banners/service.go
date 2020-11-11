@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"sync/atomic"
 )
 
 //Service ...
@@ -26,6 +25,8 @@ type Banner struct {
 	Button  string
 	Link    string
 }
+
+var sID int64 = 0
 
 //All ...
 func (s *Service) All(ctx context.Context) ([]*Banner, error) {
@@ -51,8 +52,10 @@ func (s *Service) ByID(ctx context.Context, id int64) (*Banner, error) {
 func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+
 	if item.ID == 0 {
-		item.ID = nextID()
+		sID = sID + 1
+		item.ID = sID
 		s.items = append(s.items, item)
 		return item, nil
 	}
@@ -82,9 +85,4 @@ func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 
 func removeIndex(s []*Banner, index int) []*Banner {
 	return append(s[:index], s[index+1:]...)
-}
-
-func nextID() int64 {
-	var i uint64 = 0
-	return int64(atomic.AddUint64(&i, 1))
 }
