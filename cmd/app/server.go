@@ -96,12 +96,14 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		errorWriter(w, http.StatusBadRequest)
 		return
 	}
+	//Здесь опционалная проверка то что если все данные приходит пустыми
 	if title == "" && content == "" && button == "" && link == "" {
 		log.Print(err)
 		errorWriter(w, http.StatusBadRequest)
 		return
 	}
 
+	//создаём указател на структуру баннера
 	item := &banners.Banner{
 		ID:      id,
 		Title:   title,
@@ -164,11 +166,12 @@ func (s *Server) handleRemoveByID(w http.ResponseWriter, r *http.Request) {
 +
 +
 */
-
+//это фукция для записывание ошибки в responseWriter или просто для ответа с ошиками
 func errorWriter(w http.ResponseWriter, httpSts int) {
 	http.Error(w, http.StatusText(httpSts), httpSts)
 }
 
+//это функция для ответа в формате JSON
 func respondJSON(w http.ResponseWriter, data []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	_, err := w.Write(data)
