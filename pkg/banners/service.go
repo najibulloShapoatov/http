@@ -6,13 +6,13 @@ import (
 	"sync"
 )
 
-//Service ...
+//Service .  Это сервис для управления баннерами
 type Service struct {
 	mu    sync.RWMutex
 	items []*Banner
 }
 
-//NewService ...
+//NewService . функция для создания нового сервиса
 func NewService() *Service {
 	return &Service{items: make([]*Banner, 0)}
 }
