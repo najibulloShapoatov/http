@@ -73,11 +73,11 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 			return item, nil
 		}
 	}
-	//если не нашли то вернем ошибку что у нас такого банера не сушествует 
+	//если не нашли то вернем ошибку что у нас такого банера не сушествует
 	return nil, errors.New("item not found")
 }
 
-//RemoveByID ... Метод для удаления 
+//RemoveByID ... Метод для удаления
 func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -86,18 +86,12 @@ func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 	for k, v := range s.items {
 		//если нашли то удаляем его из слайса
 		if v.ID == id {
-			s.items = removeIndex(s.items, k)
+			//берем все элементы до найденного и добавляем в него все элементы после найденного
+			s.items = append(s.items[:k], s.items[k+1:]...)
 			return v, nil
 		}
 	}
 
-	//если не нашли то вернем ошибку что у нас такого банера не сушествует 
+	//если не нашли то вернем ошибку что у нас такого банера не сушествует
 	return nil, errors.New("item not found")
 }
-
-//Функция который удаляет элемент из слайса
-func removeIndex(s []*Banner, index int) []*Banner {
-	return append(s[:index], s[index+1:]...)
-}
-
-
