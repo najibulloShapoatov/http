@@ -68,20 +68,21 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 		//выставляем новый ID для баннера
 		item.ID = sID
 
-		//проверяем если файл пришел то сохроняем его
+		//проверяем если файл пришел то сохроняем его под нужную имя например сейчас там только расширения (jpg) а мы его изменим (2.jpg)
 		if item.Image != "" {
 			//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
 			item.Image = fmt.Sprint(item.ID) + "." + item.Image
 			//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
 			err := uploadFile(file, "./web/banners/"+item.Image)
+			//если при сохронения произошел какой нибуд ошибка то возврашаем ошибку
 			if err != nil {
 				return nil, err
 			}
-		} 
+		}
 
-		//добавляем item в слайс
+		//и после этих действий мы добавляем item в слайс
 		s.items = append(s.items, item)
-		//вернем баннер и ошибку nil
+		//вернем item (так как мы берем его указател все измменения в нем уже ест) и ошибку nil
 		return item, nil
 	}
 	//если id не равно 0 то ишем его из сушествуеших
@@ -95,6 +96,7 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 				item.Image = fmt.Sprint(item.ID) + "." + item.Image
 				//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
 				err := uploadFile(file, "./web/banners/"+item.Image)
+				//если при сохронения произошел какой нибуд ошибка то возврашаем ошибку
 				if err != nil {
 					return nil, err
 				}
@@ -133,17 +135,23 @@ func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 	return nil, errors.New("item not found")
 }
 
-//это функция сохраняет файл в сервере в заданной папке path
+//это функция сохраняет файл в сервере в заданной папке path и возврашает nil если все успешно или error если ест ошибка
 func uploadFile(file multipart.File, path string) error {
+	//прочитаем вес файл и получаем слайс из байтов
 	var data, err = ioutil.ReadAll(file)
+	//если не удалос прочитат то вернем ошибку
 	if err != nil {
 		return errors.New("not readble data")
 	}
 
+	//записываем файл в заданной папке с публичными правами
 	err = ioutil.WriteFile(path, data, 0666)
+
+	//если не удалось записыват файл то вернем ошибку
 	if err != nil {
 		return errors.New("not saved from folder ")
 	}
 
+	//если все успешно то вернем nil
 	return nil
 }

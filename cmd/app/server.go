@@ -136,20 +136,6 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//здес мы получаем файл (а здес только файл) и хедер файла (тоест имя и другие данные о файле) из формы
-	file, fileHeader, err := r.FormFile("image")
-	//обявляем расширению пустым если файл пришел то его будем заполнят
-	ext := ""
-	if err == nil { 
-
-		//Получаем расширеную файла например global.jpg берём только jpg а осталное будем генерироват  в сервисе
-		//здес разделяем имя файла по "."
-		var name = strings.Split(fileHeader.Filename, ".")
-		// берем последный тоест jpg
-		ext = name[len(name)-1]
-
-	}
-
 	//создаём указател на структуру баннера
 	item := &banners.Banner{
 		ID:      id,
@@ -157,8 +143,23 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		Content: content,
 		Button:  button,
 		Link:    link,
-		Image:   ext,
 	}
+
+	//здес мы получаем файл (а здес только файл) и хедер файла (тоест имя и другие данные о файле) из формы
+	file, fileHeader, err := r.FormFile("image")
+
+	//если нет ошибки значит файл пришел то берем его имя тоест расширения
+	if err == nil { 
+		//Получаем расширеную файла например global.jpg берём только jpg а осталное будем генерироват  в сервисе
+		//здес разделяем имя файла по "."
+		var name = strings.Split(fileHeader.Filename, ".")
+		// берем последный элемент из массива тоест jpg и вставляем его в item.Image (в методе Save его будем менят)
+		item.Image = name[len(name)-1]
+
+
+	}
+
+	
 
 	//вызываем метод Save тоест сохраняем или обновляем его
 	banner, err := s.bannerSvc.Save(r.Context(), item, file)
