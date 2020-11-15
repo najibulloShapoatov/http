@@ -85,16 +85,21 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 	for k, v := range s.items {
 		//если нашли то заменяем старый баннер с новым
 		if v.ID == item.ID {
-			
-			//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
-			item.Image = fmt.Sprint(item.ID) + "." + item.Image
-			//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
-			err := uploadFile(file, "./web/banners/"+item.Image)
-			if err != nil {
-				return nil, err
+
+			//проверяем если файл пришел со сохроняем его
+			if item.Image == "" {
+				//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
+				item.Image = fmt.Sprint(item.ID) + "." + item.Image
+				//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
+				err := uploadFile(file, "./web/banners/"+item.Image)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				//если файл не пришел то просто поставим передуюший значения в поля Image
+				item.Image = s.items[k].Image
 			}
 
-			
 			//если нашли то в слайс под индексом найденного выставим новый элемент
 			s.items[k] = item
 			//вернем баннер и ошибку nil
