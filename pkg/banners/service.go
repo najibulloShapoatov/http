@@ -3,6 +3,9 @@ package banners
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io/ioutil"
+	"mime/multipart"
 	"sync"
 )
 
@@ -24,6 +27,7 @@ type Banner struct {
 	Content string
 	Button  string
 	Link    string
+	Image   string
 }
 
 //это стартовый ID но для каждого создание баннера его изменяем
@@ -53,7 +57,7 @@ func (s *Service) ByID(ctx context.Context, id int64) (*Banner, error) {
 }
 
 //Save ...
-func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
+func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (*Banner, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -63,7 +67,16 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 		sID++
 		//выставляем новый ID для баннера
 		item.ID = sID
-		//добавляем его в слайс
+
+		//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
+		item.Image = fmt.Sprint(item.ID) + "." + item.Image
+		//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
+		err := uploadFile(file, "./web/banners/"+item.Image)
+		if err != nil {
+			return nil, err
+		}
+
+		//добавляем item в слайс
 		s.items = append(s.items, item)
 		//вернем баннер и ошибку nil
 		return item, nil
@@ -72,6 +85,16 @@ func (s *Service) Save(ctx context.Context, item *Banner) (*Banner, error) {
 	for k, v := range s.items {
 		//если нашли то заменяем старый баннер с новым
 		if v.ID == item.ID {
+			
+			//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
+			item.Image = fmt.Sprint(item.ID) + "." + item.Image
+			//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
+			err := uploadFile(file, "./web/banners/"+item.Image)
+			if err != nil {
+				return nil, err
+			}
+
+			
 			//если нашли то в слайс под индексом найденного выставим новый элемент
 			s.items[k] = item
 			//вернем баннер и ошибку nil
@@ -100,4 +123,19 @@ func (s *Service) RemoveByID(ctx context.Context, id int64) (*Banner, error) {
 
 	//если не нашли то вернем ошибку что у нас такого банера не сушествует
 	return nil, errors.New("item not found")
+}
+
+//это функция сохраняет файл в сервере в заданной папке path
+func uploadFile(file multipart.File, path string) error {
+	var data, err = ioutil.ReadAll(file)
+	if err != nil {
+		return errors.New("not readble data")
+	}
+
+	err = ioutil.WriteFile(path, data, 0666)
+	if err != nil {
+		return errors.New("not saved from folder ")
+	}
+
+	return nil
 }

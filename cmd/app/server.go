@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/najibulloShapoatov/http/pkg/banners"
 )
@@ -111,11 +112,11 @@ func (s *Server) handleGetBannerByID(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 
 	//получаем данные из параметра запроса
-	idP := r.URL.Query().Get("id")
-	title := r.URL.Query().Get("title")
-	content := r.URL.Query().Get("content")
-	button := r.URL.Query().Get("button")
-	link := r.URL.Query().Get("link")
+	idP := r.PostFormValue("id")
+	title := r.PostFormValue("title")
+	content := r.PostFormValue("content")
+	button := r.PostFormValue("button")
+	link := r.PostFormValue("link")
 
 	id, err := strconv.ParseInt(idP, 10, 64)
 	//если получили ошибку то отвечаем с ошибкой
@@ -135,6 +136,22 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//здес мы получаем файл (а здес только файл) и хедер файла (тоест имя и другие данные о файле) из формы
+	file, fileHeader, err := r.FormFile("image")
+	if err != nil {
+		//печатаем ошибку
+		log.Print(err)
+		//вызываем фукцию для ответа с ошибкой
+		errorWriter(w, http.StatusInternalServerError)
+		return
+	}
+
+	//Получаем расширеную файла например global.jpg берём только jpg а осталное будем генерироват  в сервисе
+	//здес разделяем имя файла по "."
+	var name = strings.Split(fileHeader.Filename, ".")
+	// берем последный тоест jpg
+	var ext = name[len(name)-1]
+
 	//создаём указател на структуру баннера
 	item := &banners.Banner{
 		ID:      id,
@@ -142,10 +159,11 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 		Content: content,
 		Button:  button,
 		Link:    link,
+		Image:   ext,
 	}
 
 	//вызываем метод Save тоест сохраняем или обновляем его
-	banner, err := s.bannerSvc.Save(r.Context(), item)
+	banner, err := s.bannerSvc.Save(r.Context(), item, file)
 
 	//если получили ошибку то отвечаем с ошибкой
 	if err != nil {
