@@ -139,14 +139,14 @@ func (s *Server) handleSaveBanner(w http.ResponseWriter, r *http.Request) {
 	//здес мы получаем файл (а здес только файл) и хедер файла (тоест имя и другие данные о файле) из формы
 	file, fileHeader, err := r.FormFile("image")
 	//обявляем расширению пустым если файл пришел то его будем заполнят
-	ext:=""
-	if err != nil {
+	ext := ""
+	if err == nil { 
 
 		//Получаем расширеную файла например global.jpg берём только jpg а осталное будем генерироват  в сервисе
 		//здес разделяем имя файла по "."
 		var name = strings.Split(fileHeader.Filename, ".")
 		// берем последный тоест jpg
-		 ext = name[len(name)-1]
+		ext = name[len(name)-1]
 
 	}
 

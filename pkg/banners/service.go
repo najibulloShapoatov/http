@@ -77,9 +77,7 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 			if err != nil {
 				return nil, err
 			}
-		} else {
-			return nil, errors.New("file not sended")
-		}
+		} 
 
 		//добавляем item в слайс
 		s.items = append(s.items, item)
