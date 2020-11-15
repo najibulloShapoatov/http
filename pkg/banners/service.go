@@ -68,12 +68,15 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 		//выставляем новый ID для баннера
 		item.ID = sID
 
-		//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
-		item.Image = fmt.Sprint(item.ID) + "." + item.Image
-		//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
-		err := uploadFile(file, "./web/banners/"+item.Image)
-		if err != nil {
-			return nil, err
+		//проверяем если файл пришел то сохроняем его
+		if item.Image != "" {
+			//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
+			item.Image = fmt.Sprint(item.ID) + "." + item.Image
+			//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
+			err := uploadFile(file, "./web/banners/"+item.Image)
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		//добавляем item в слайс
@@ -86,8 +89,8 @@ func (s *Service) Save(ctx context.Context, item *Banner, file multipart.File) (
 		//если нашли то заменяем старый баннер с новым
 		if v.ID == item.ID {
 
-			//проверяем если файл пришел со сохроняем его
-			if item.Image == "" {
+			//проверяем если файл пришел то сохроняем его
+			if item.Image != "" {
 				//генерируем имя файла например ID равно 2 и раширения файла jpg то 2.jpg
 				item.Image = fmt.Sprint(item.ID) + "." + item.Image
 				//и вызываем фукции для загрузки файла на сервер и передаем ему файл и path  где нужно сохранить файл  ./web/banners/2.jpg
